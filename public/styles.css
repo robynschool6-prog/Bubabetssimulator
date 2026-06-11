@@ -1,0 +1,465 @@
+/* OddsLab — simulation only, no real money betting.
+   Palette: ink slate + floodlight amber + return teal. Deliberately NOT a
+   green-and-yellow bookmaker look. */
+
+:root {
+  --ink: #13161f;
+  --surface: #1c2230;
+  --raised: #262e40;
+  --line: #313b52;
+  --text: #edeff4;
+  --muted: #8a93a8;
+  --amber: #f5a524;
+  --amber-deep: #c87f0a;
+  --teal: #3bd6c0;
+  --rose: #e5566b;
+  --radius: 10px;
+  --display: "Saira Condensed", sans-serif;
+  --body: "Inter", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+button { font-family: inherit; cursor: pointer; }
+input { font-family: inherit; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.brand-mark {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 1px;
+  background: var(--amber);
+  color: var(--ink);
+  padding: 6px 9px;
+  border-radius: 8px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.brand-sub { margin: 0; color: var(--muted); font-size: 11px; }
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.balance-pill {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  color: var(--text);
+}
+.balance-pill:hover { border-color: var(--amber); }
+.balance-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+.balance-value {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- buttons ---------- */
+.btn {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--raised);
+  color: var(--text);
+  transition: border-color 0.15s, background 0.15s, transform 0.08s;
+}
+.btn:hover { border-color: var(--amber); }
+.btn:active { transform: scale(0.98); }
+.btn.primary {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--ink);
+  width: 100%;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-family: var(--display);
+  letter-spacing: 0.8px;
+  font-weight: 700;
+}
+.btn.primary:hover { background: #ffb838; }
+.btn.primary:disabled { background: var(--line); border-color: var(--line); color: var(--muted); cursor: not-allowed; }
+.btn.ghost { background: transparent; }
+.btn.small { padding: 6px 10px; font-size: 12px; width: 100%; margin-top: 8px; }
+
+/* ---------- signature LED strip ---------- */
+.sim-strip {
+  overflow: hidden;
+  background: #0b0d13;
+  border-bottom: 1px solid var(--line);
+  padding: 6px 0;
+}
+.sim-strip-track {
+  display: flex;
+  gap: 56px;
+  white-space: nowrap;
+  width: max-content;
+  animation: ticker 28s linear infinite;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--amber);
+  text-shadow: 0 0 8px rgba(245, 165, 36, 0.45);
+}
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sim-strip-track { animation: none; }
+}
+
+/* ---------- layout ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 18px;
+  padding: 18px 22px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ---------- sport tabs ---------- */
+.sport-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.sport-tab {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.sport-tab:hover { color: var(--text); border-color: var(--amber); }
+.sport-tab.active { background: var(--amber); border-color: var(--amber); color: var(--ink); font-weight: 600; }
+
+.board-status { color: var(--muted); font-size: 13px; min-height: 20px; margin-bottom: 10px; }
+.board-status .error { color: var(--rose); }
+
+/* ---------- view tabs ---------- */
+.view-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 4px;
+  width: max-content;
+}
+.view-tab {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 7px 16px;
+  border-radius: 7px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.view-tab:hover { color: var(--text); }
+.view-tab.active { background: var(--amber); color: var(--ink); }
+
+/* ---------- World Cup groups ---------- */
+.groups-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.group-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.group-letter {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--amber);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+.group-team { padding: 4px 0; font-size: 13.5px; }
+
+/* ---------- extra markets expander ---------- */
+.more-btn { margin-top: 12px; width: auto; padding: 6px 14px; }
+.extra-markets { border-top: 1px dashed var(--line); margin-top: 4px; }
+.extra-markets:empty { border-top: none; }
+.extra-markets .market-row { max-height: 220px; overflow-y: auto; }
+.extra-markets .odds-tile { flex: 1 1 100px; min-width: 95px; }
+
+/* ---------- event cards ---------- */
+.events { display: flex; flex-direction: column; gap: 12px; }
+
+.event-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.event-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.event-teams {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.event-time { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.event-time.live { color: var(--teal); font-weight: 600; }
+
+.market { margin-top: 8px; }
+.market-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.market-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* scoreboard odds tiles */
+.odds-tile {
+  flex: 1 1 120px;
+  min-width: 110px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text);
+  transition: border-color 0.12s, background 0.12s;
+}
+.odds-tile:hover { border-color: var(--amber); }
+.odds-tile .o-name { font-size: 12.5px; color: var(--muted); text-align: left; }
+.odds-tile .o-price {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+}
+.odds-tile.selected {
+  background: var(--amber);
+  border-color: var(--amber);
+}
+.odds-tile.selected .o-name,
+.odds-tile.selected .o-price { color: var(--ink); }
+
+/* ---------- betslip panel ---------- */
+.slip-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  align-self: start;
+  position: sticky;
+  top: 16px;
+  overflow: hidden;
+}
+
+.slip-tabs { display: flex; border-bottom: 1px solid var(--line); }
+.slip-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 12px 0;
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid transparent;
+}
+.slip-tab.active { color: var(--text); border-bottom-color: var(--amber); }
+.count {
+  background: var(--raised);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 12px;
+  color: var(--amber);
+}
+
+.panel { display: none; padding: 14px; }
+.panel.active { display: block; }
+
+.panel-note {
+  margin: 0 0 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--amber);
+  border: 1px dashed var(--amber-deep);
+  border-radius: 6px;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+.slip-items { display: flex; flex-direction: column; gap: 8px; }
+
+.slip-item {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  position: relative;
+}
+.slip-item .s-pick { font-weight: 600; font-size: 13.5px; }
+.slip-item .s-meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.slip-item .s-odds {
+  position: absolute;
+  top: 10px;
+  right: 34px;
+  font-family: var(--display);
+  font-weight: 700;
+  color: var(--amber);
+  font-size: 16px;
+}
+.s-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px 4px;
+}
+.s-remove:hover { color: var(--rose); }
+
+.slip-footer { margin-top: 14px; }
+.slip-footer.hidden { display: none; }
+
+.stake-row label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+.stake-row input {
+  width: 100%;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 16px;
+  padding: 9px 12px;
+  font-variant-numeric: tabular-nums;
+}
+.stake-row input:focus { outline: none; border-color: var(--amber); }
+
+.totals { margin: 12px 0; }
+.totals-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13.5px; }
+.totals-row strong { font-family: var(--display); font-size: 17px; font-variant-numeric: tabular-nums; }
+.totals-row.return strong { color: var(--teal); }
+
+.empty { color: var(--muted); text-align: center; padding: 22px 8px; font-size: 13px; }
+.empty.hidden { display: none; }
+
+/* ---------- history ---------- */
+.history-items { display: flex; flex-direction: column; gap: 8px; }
+.history-bet {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.h-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.h-tag {
+  color: var(--teal);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.h-leg { font-size: 12.5px; padding: 2px 0; }
+.h-leg span { color: var(--muted); }
+.h-line { display: flex; justify-content: space-between; font-size: 12.5px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line); }
+.h-line strong { font-variant-numeric: tabular-nums; }
+
+/* ---------- footer ---------- */
+.footnote {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 22px 16px 30px;
+}
+
+/* ---------- toast ---------- */
+.toast {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: var(--raised);
+  border: 1px solid var(--amber);
+  color: var(--text);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 50;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .slip-panel { position: static; order: -1; }
+  .topbar { flex-wrap: wrap; }
+}
+
+/* focus visibility */
+button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}

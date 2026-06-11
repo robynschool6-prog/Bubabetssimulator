@@ -1,0 +1,16 @@
+{
+  "name": "oddslab-simulator",
+  "version": "1.0.0",
+  "description": "OddsLab - a sportsbook-style betslip and odds SIMULATOR. No real money. Educational/demo use only.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

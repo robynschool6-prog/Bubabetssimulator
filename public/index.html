@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OddsLab — Betslip Simulator (no real money)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">OL</span>
+      <div>
+        <h1>OddsLab</h1>
+        <p class="brand-sub">Betslip simulator</p>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <button id="balancePill" class="balance-pill" title="Click to set a fake balance">
+        <span class="balance-label">Demo balance</span>
+        <span id="balanceValue" class="balance-value">0.00</span>
+      </button>
+      <button id="resetBtn" class="btn ghost">Reset demo account</button>
+    </div>
+  </header>
+
+  <!-- Signature LED strip -->
+  <div class="sim-strip" role="note" aria-label="Simulation only, no real money betting">
+    <div class="sim-strip-track">
+      <span>SIMULATION ONLY — NO REAL MONEY BETTING</span>
+      <span>DEMO CREDITS HAVE NO VALUE</span>
+      <span>NO DEPOSITS · NO WITHDRAWALS</span>
+      <span>SIMULATION ONLY — NO REAL MONEY BETTING</span>
+      <span>DEMO CREDITS HAVE NO VALUE</span>
+      <span>NO DEPOSITS · NO WITHDRAWALS</span>
+    </div>
+  </div>
+
+  <main class="layout">
+    <!-- LEFT: sports + events -->
+    <section class="board">
+      <nav id="sportTabs" class="sport-tabs" aria-label="Sports"></nav>
+      <nav id="viewTabs" class="view-tabs" aria-label="Views">
+        <button class="view-tab active" data-view="upcoming">Upcoming</button>
+        <button class="view-tab" data-view="all">All matches</button>
+        <button class="view-tab" data-view="groups" id="groupsTab">Groups</button>
+      </nav>
+      <div id="boardStatus" class="board-status"></div>
+      <div id="events" class="events"></div>
+      <div id="groupsView" class="groups-view" hidden></div>
+    </section>
+
+    <!-- RIGHT: betslip + history -->
+    <aside class="slip-panel">
+      <div class="slip-tabs">
+        <button class="slip-tab active" data-panel="slip">
+          Betslip <span id="slipCount" class="count">0</span>
+        </button>
+        <button class="slip-tab" data-panel="history">
+          History <span id="historyCount" class="count">0</span>
+        </button>
+      </div>
+
+      <div id="panel-slip" class="panel active">
+        <p class="panel-note">Simulation only — no real money betting.</p>
+        <div id="slipItems" class="slip-items"></div>
+
+        <div id="slipFooter" class="slip-footer hidden">
+          <div class="stake-row">
+            <label for="stakeInput">Stake (demo credits)</label>
+            <input id="stakeInput" type="number" min="0" step="0.5" placeholder="10.00" />
+          </div>
+          <div class="totals">
+            <div class="totals-row">
+              <span>Total odds</span>
+              <strong id="totalOdds">—</strong>
+            </div>
+            <div class="totals-row return">
+              <span>Potential return</span>
+              <strong id="potentialReturn">—</strong>
+            </div>
+          </div>
+          <button id="placeBetBtn" class="btn primary">Place simulated bet</button>
+          <button id="clearSlipBtn" class="btn ghost small">Clear slip</button>
+        </div>
+
+        <div id="slipEmpty" class="empty">
+          Tap any odds tile to add a selection.
+        </div>
+      </div>
+
+      <div id="panel-history" class="panel">
+        <p class="panel-note">Simulated bets are stored only in your browser.</p>
+        <div id="historyItems" class="history-items"></div>
+        <div id="historyEmpty" class="empty">No simulated bets yet.</div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footnote">
+    OddsLab is an educational demo. Simulation only — no real money betting, no deposits, no withdrawals.
+    Odds data via The Odds API.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
