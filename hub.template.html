@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OddsLab — World Cup Hub (simulation companion)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <script type="module" crossorigin src="https://widgets.api-sports.io/3.1.0/widgets.js"></script>
+  <style>
+    :root {
+      --ink: #13161f; --surface: #1c2230; --raised: #262e40; --line: #313b52;
+      --text: #edeff4; --muted: #8a93a8; --amber: #f5a524; --teal: #3bd6c0;
+      --radius: 10px;
+      --display: "Saira Condensed", sans-serif;
+      --body: "Inter", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--ink); color: var(--text); font-family: var(--body); }
+
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 14px 22px; background: var(--surface); border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: 1px;
+      background: var(--amber); color: var(--ink); padding: 6px 9px; border-radius: 8px;
+    }
+    .brand h1 { margin: 0; font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+    .brand-sub { margin: 0; color: var(--muted); font-size: 11px; }
+    .back {
+      border: 1px solid var(--line); border-radius: var(--radius); padding: 9px 14px;
+      font-size: 13px; font-weight: 600; background: var(--raised); color: var(--text);
+      text-decoration: none;
+    }
+    .back:hover { border-color: var(--amber); }
+
+    .sim-note {
+      text-align: center; font-family: var(--display); font-weight: 600; font-size: 13px;
+      letter-spacing: 3px; color: var(--amber); background: #0b0d13;
+      border-bottom: 1px solid var(--line); padding: 7px 10px;
+      text-shadow: 0 0 8px rgba(245,165,36,.45);
+    }
+
+    .hub {
+      display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 18px;
+      padding: 18px 22px; max-width: 1280px; margin: 0 auto;
+    }
+    .panel {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .panel h2 {
+      margin: 0; padding: 12px 16px; font-family: var(--display); font-size: 16px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 1px solid var(--line); color: var(--amber);
+    }
+    .panel-inner { padding: 8px; }
+    .stack { display: flex; flex-direction: column; gap: 18px; }
+
+    api-sports-widget {
+      --primary-font-size: 0.82rem;
+      --secondary-font-size: 0.8rem;
+      --button-font-size: 0.8rem;
+      --title-font-size: 0.9rem;
+    }
+    #game-content .card-body { min-height: 120px; }
+    #game-content .placeholder { color: var(--muted); font-size: 13px; text-align: center; padding: 28px 12px; }
+    body .modal-widget { width: 90%; max-width: 700px; }
+    body .modal-widget-content { padding: 0; height: 60vh; }
+
+    .quota-note { text-align: center; color: var(--muted); font-size: 12px; padding: 14px 16px 26px; }
+
+    @media (max-width: 900px) { .hub { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">OL</span>
+      <div>
+        <h1>World Cup Hub</h1>
+        <p class="brand-sub">Live fixtures · results · standings</p>
+      </div>
+    </div>
+    <a class="back" href="/">← Back to simulator</a>
+  </header>
+
+  <div class="sim-note">SIMULATION COMPANION — NO REAL MONEY BETTING</div>
+
+  <main class="hub">
+    <section class="panel">
+      <h2>Fixtures &amp; live scores</h2>
+      <div class="panel-inner">
+        <api-sports-widget data-type="league"></api-sports-widget>
+      </div>
+    </section>
+
+    <div class="stack">
+      <section class="panel" id="game-content">
+        <h2>Match detail</h2>
+        <div class="card-body">
+          <div class="placeholder">Click any match on the left to see lineups, events and stats here.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Group standings</h2>
+        <div class="panel-inner" id="standings-content">
+          <api-sports-widget data-type="standings"></api-sports-widget>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <p class="quota-note">
+    Data by API-Sports. Widgets refresh every 60 seconds while this page is open —
+    close the tab when not in use to preserve the daily request quota.
+  </p>
+
+  <!-- Global widget config: World Cup 2026 = league 1, season 2026 -->
+  <api-sports-widget
+    data-type="config"
+    data-key="__APISPORTS_KEY__"
+    data-sport="football"
+    data-lang="en"
+    data-theme="dark"
+    data-show-errors="false"
+    data-show-logos="true"
+    data-refresh="60"
+    data-standings="true"
+    data-target-standings="true"
+    data-target-game="#game-content .card-body"
+    data-target-player="modal"
+    data-target-team="modal"
+    data-game-tab="statistics"
+    data-tab="games"
+    data-league="1"
+    data-season="2026"
+  ></api-sports-widget>
+</body>
+</html>

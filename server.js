@@ -62,12 +62,12 @@ const TTL_MS = 5 * 60 * 1000;
 
 function cacheGet(key) {
   const hit = cache.get(key);
-  if (hit && Date.now() - hit.t < TTL_MS) return hit.v;
+  if (hit && Date.now() - hit.t < (hit.ttl || TTL_MS)) return hit.v;
   cache.delete(key);
   return null;
 }
-function cacheSet(key, v) {
-  cache.set(key, { t: Date.now(), v });
+function cacheSet(key, v, ttl) {
+  cache.set(key, { t: Date.now(), v, ttl });
 }
 
 // ---- helpers ----------------------------------------------------------------
@@ -118,6 +118,26 @@ function cleanEvent(ev) {
 
 // ---- middleware --------------------------------------------------------------
 app.use(express.static(path.join(__dirname, "public")));
+
+// World Cup Hub — API-Sports widgets page. The key is injected server-side
+// from the APISPORTS_KEY env var so it never lives in the repository.
+const fs = require("fs");
+app.get("/hub", (req, res) => {
+  const key = process.env.APISPORTS_KEY;
+  if (!key) {
+    return res
+      .status(500)
+      .send(
+        "<h2 style='font-family:sans-serif'>World Cup Hub not configured</h2>" +
+        "<p style='font-family:sans-serif'>Add an <code>APISPORTS_KEY</code> environment variable " +
+        "(free key from dashboard.api-football.com) and redeploy.</p>"
+      );
+  }
+  const html = fs
+    .readFileSync(path.join(__dirname, "hub.template.html"), "utf8")
+    .replace("__APISPORTS_KEY__", key);
+  res.type("html").send(html);
+});
 
 app.use("/api", (req, res, next) => {
   // Static endpoints don't need the upstream API
@@ -170,6 +190,47 @@ app.get("/api/odds/:sport", async (req, res) => {
     res
       .status(err.status === 401 ? 401 : 502)
       .json({ error: err.status === 401 ? "Invalid API key." : "Could not fetch odds right now." });
+  }
+});
+
+/**
+ * Live + recent scores for one sport (The Odds API scores endpoint).
+ * Cached 60s. Costs 2 API credits per uncached call (daysFrom included).
+ * GET /api/scores/:sport
+ */
+app.get("/api/scores/:sport", async (req, res) => {
+  const sport = req.params.sport;
+  if (!SPORTS.some((s) => s.id === sport)) {
+    return res.status(400).json({ error: "Unknown sport key." });
+  }
+
+  const cacheKey = `scores:${sport}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return res.json({ ...cached, cached: true });
+
+  const url =
+    `${BASE}/sports/${encodeURIComponent(sport)}/scores` +
+    `?apiKey=${API_KEY}&daysFrom=1`;
+
+  try {
+    const { data } = await fetchOddsApi(url);
+    const payload = {
+      sport,
+      games: data.map((g) => ({
+        id: g.id,
+        commenceTime: g.commence_time,
+        completed: g.completed,
+        home: g.home_team,
+        away: g.away_team,
+        lastUpdate: g.last_update,
+        scores: (g.scores || []).map((s) => ({ name: s.name, score: s.score }))
+      }))
+    };
+    cacheSet(cacheKey, payload, 60 * 1000);
+    res.json(payload);
+  } catch (err) {
+    console.error(err.message);
+    res.status(502).json({ error: "Could not fetch scores right now." });
   }
 });
 
